@@ -22,7 +22,7 @@ const weatherClass = {
 
 // Load and validate the API key input from user and blank screen if invalid
 function loadAPIKey(){
-    var inputAPIKey = prompt("Please input a valid (Open Weather) API Key", "36716e91288f48d1fb0d996c17c7ce73");
+    var inputAPIKey = prompt("Please input a valid (Open Weather) API Key", "");
 
     if (inputAPIKey != null){
         API_key = inputAPIKey.trim();
