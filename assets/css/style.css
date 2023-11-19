@@ -1,41 +1,54 @@
+/* Set the weather icon to 50px height and width  */
 img {
-    height: 50px;
-    width: 50px;
-  }
-  
-  .form-input {
-    padding: 3px;
-    font-size: 80%;
-    letter-spacing: 0rem;
-    height: 25px;
-    width: 300px;
-  }
-  
-  .btn {
-    margin: 10px;
-    border-radius: 300px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: white;
-    background-color: blue;
-    width: 300px;
-  }
-  
-  .btn:hover,
-  .btn:focus,
-  .btn:active {
-    color: red;
-    border-color: blue;
-    background-color: #F0F0F0;
-  }
-  
-#today {
-    border: 2px solid blue;
+  height: 50px;
+  width: 50px;
 }
 
-  #forecast {
-    margin: 20px;
-    width: 200px;
-    color: white;
-    background-color: chocolate;
-  }
+/* Set the css for the City input textbox */
+.form-input {
+  padding: 3px;
+  font-size: 100%;
+  letter-spacing: 0rem;
+  height: 35px;
+  width: 300px;
+}
+
+/* Set the css for the button for Searching the City input */
+.btn {
+  margin-top: 10px;
+  border-radius: 300px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: white;
+  background-color: blue;
+  width: 300px;
+}
+  
+.btn:hover,
+.btn:focus,
+.btn:active {
+  color: red;
+  border-color: blue;
+  background-color: #F0F0F0;
+}
+
+/* Set the css for the result shown for today weather */
+#today {
+  padding: 10px;
+  margin: 20px;
+  border: 2px solid blue;
+}
+
+/* Set the css for the result shown for forecast weather */
+.col {
+  padding: 10px;
+  margin: 20px;
+  width: 200px;
+  color: white;
+  background-color: saddlebrown;
+} 
+
+/* Set the css for the buttons on stored City names */
+.list-group-item {
+  background-color: pink;
+}

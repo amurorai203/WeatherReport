@@ -1,13 +1,16 @@
 var dataLoad = [];
 var API_key = "";
-var testLocation = "Chicago";
+var defaultLocation = $("#search-input").attr("placeholder");
 var currentAPIURL = "https://api.openweathermap.org/data/2.5/weather"; 
 var forecastAPIURL = "https://api.openweathermap.org/data/2.5/forecast";
 var queryURL = "";
 var weatherIconPrefix = "https://openweathermap.org/img/wn/";
 var weatherIconSuffix = "@2x.png";
-var today = dayjs().format("MM/DD/YYYY");
+var dateFormat = "MM/DD/YYYY";
+var today = dayjs().format(dateFormat);
+var storageName = "search-history";
 
+// Define the object for weather information
 const weatherClass = {
     Date: dayjs(),
     icon: "",
@@ -17,87 +20,93 @@ const weatherClass = {
     humidity: ""
 }
 
+// Load and validate the API key input from user and blank screen if invalid
 function loadAPIKey(){
-    var inputAPIKey = prompt("Please input a valid (Open Weather) API Key", "");
-    console.log(inputAPIKey);
+    var inputAPIKey = prompt("Please input a valid (Open Weather) API Key", "36716e91288f48d1fb0d996c17c7ce73");
+
     if (inputAPIKey != null){
         API_key = inputAPIKey.trim();
-        console.log("In loadAPI ");
-        callAPI(testLocation, dayjs().format("MM/DD/YYYY"));
-        // if (callAPI(testLocation)){
-        //     return true;
-        // } else {
-        //     loadAPIKey();
-        // }
+
+        callAPI(defaultLocation, dayjs().format(dateFormat));
         return true;
     } else{
-        console.log("nothing input");
         $(".container-fluid").empty();
         return false;
     }
 }
 
-function callAPI(location, queryDate){
-
+// Function to trigger Weather API to collect data and display result
+function callAPI(location, isNew){
+    // Clear the today and forecast area
+    $("#today").empty();
+    $("#forecast").empty();
     queryURL = currentAPIURL + "?units=metric&q=" + location + "&appid=" + API_key;
+
+    // fetch the prepared today API URL
     fetch(queryURL)
     .then(function(response){
-        console.log("äfter fetch");
         return response.json();
     })
     .then(function (data){
         var results = data;
-        console.log(data);
+        // console.log(data);
+        // Create and assign return from Weather API for today weather info
         var workingWeather = Object.create(weatherClass);        
-        workingWeather.Date = queryDate;
+        workingWeather.Date = dayjs.unix(data.dt).format(dateFormat);
         workingWeather.icon = data.weather[0].icon;
         workingWeather.iconUrl = weatherIconPrefix + data.weather[0].icon + weatherIconSuffix;
         workingWeather.temp = data.main.temp;
         workingWeather.wind = data.wind.speed;
         workingWeather.humidity = data.main.humidity;
-        console.log(workingWeather);
-
+        // Create and display today weather info
         var objectElt = CreateDisplayElt(location, workingWeather, "column");
-        $("#today").empty();
         $("#today").append(objectElt);
 
     }) .catch(err => {
-        console.error("This is error return from Open Weather API: ", err)
-        return false;
+        // console.error("This is error return from Open Weather API: ", err);
+        alert("This is error return from Open Weather API: " + err);
     })
 
-    queryURL = forecastAPIURL + "?units=metric&q=" + location + "&appid=" + API_key;   
+    queryURL = forecastAPIURL + "?units=metric&q=" + location + "&appid=" + API_key;  
+    
+    // fetch the prepared forecast API URL
     fetch(queryURL)
     .then(function(response){
-        console.log("äfter fetch");
         return response.json();
     })
     .then(function (data){
         var results = data;
-        console.log(data);
-        $("#forecast").empty();
-        $("#forecast").append("<h3>5 Day - Forecast</h3>");
-        for (let x=0;x<5;x++){
+        // console.log(data);
+        var headerElt = $("<div>");
+        headerElt.text("5 Day - Forecast");
+        $("#forecast").append(headerElt);
+        // Loop the return result for 5 forecast weather info
+        for (let x=1;x<6;x++){
             var workingWeather = Object.create(weatherClass);        
-            workingWeather.Date = dayjs.unix(data.list[x*8].dt).format("MM/DD/YYYY");
-            workingWeather.icon = data.list[x*8].weather[0].icon;
-            workingWeather.iconUrl = weatherIconPrefix + data.list[x*8].weather[0].icon + weatherIconSuffix;
-            workingWeather.temp = data.list[x*8].main.temp;
-            workingWeather.wind = data.list[x*8].wind.speed;
-            workingWeather.humidity = data.list[x*8].main.humidity;
-            console.log(workingWeather);
-
-            var objectElt = CreateDisplayElt(location, workingWeather, "column");
+            workingWeather.Date = dayjs.unix(data.list[x*8-1].dt).format(dateFormat);
+            workingWeather.icon = data.list[x*8-1].weather[0].icon;
+            workingWeather.iconUrl = weatherIconPrefix + data.list[x*8-1].weather[0].icon + weatherIconSuffix;
+            workingWeather.temp = data.list[x*8-1].main.temp;
+            workingWeather.wind = data.list[x*8-1].wind.speed;
+            workingWeather.humidity = data.list[x*8-1].main.humidity;
+            // Add the created elements and display in forecast area
+            var objectElt = CreateDisplayElt(location, workingWeather, "col");
             $("#forecast").append(objectElt);
         }
-        return true;
+
+        // Save and refresh buttons if needed
+        if (isNew){
+            saveRecord(location);
+            loadData();
+        }
     }) .catch(err => {
-        console.error("This is error return from Open Weather API: ", err)
-        return false;
+        // console.error("This is error return from Open Weather API: ", err);
+        alert("This is error return from Open Weather API: " + err);
     })
 }
 
 function CreateDisplayElt(location, weatherClass, rowcolumn){
+    // Create the HTML object for displaying the collected Weather information
     var weatherContainerElt = $("<div>");
     weatherContainerElt.addClass(rowcolumn);
     var divElt = $("<p>");
@@ -105,8 +114,6 @@ function CreateDisplayElt(location, weatherClass, rowcolumn){
     var iconElt = $("<img>");
     iconElt.addClass("class=img-fluid");
     iconElt.attr("src", weatherClass.iconUrl);
-    // iconElt.attr("height", "50px");
-    // iconElt.attr("width", "50px");
     var tempElt = $("<p>");
     tempElt.text("Temp: " + weatherClass.temp + "°C");
     var windElt = $("<p>");
@@ -123,16 +130,16 @@ function CreateDisplayElt(location, weatherClass, rowcolumn){
 }
 
 function loadData(){
-    var tempDataLoad = JSON.parse(localStorage.getItem("search-history"));
+    var tempDataLoad = JSON.parse(localStorage.getItem(storageName));
     if (tempDataLoad != null){
         dataLoad = tempDataLoad;
-        console.log(dataLoad);
+        // Empty the search history area and create with buttons stored in local datastore
+        $("#history").empty();
         for (let i=0;i<dataLoad.length;i++){
             var buttonElt = $("<button>");
             buttonElt.addClass("list-group-item list-group-item-action");
             buttonElt.attr("type", "button");
             buttonElt.text(dataLoad[i]);
-            console.log(dataLoad[i]);
             var pElt = $("<p>");
             $("#history").append(pElt);
             $("#history").append(buttonElt);
@@ -141,27 +148,32 @@ function loadData(){
 }
 
 $("#history").on("click", ".list-group-item", function(event){
-    console.log(event.target);
+    // Get the clicked City name and call API for weather info
     var location = event.target.textContent;
-    callAPI(location, dayjs().format("MM/DD/YYYY"));
+    callAPI(location, false);
 })
 
 $("#search-button").on("click", function(event){
     event.preventDefault();
+    // Get the input City information and call API for weather info
     var location = $("#search-input").val();
-    saveRecord(location);
-    callAPI(location, dayjs().format("MM/DD/YYYY"));
+    callAPI(location, true);
+    // Clear the input area for next input
+    $("#search-input").attr("placeholder", "");
+    $("#search-input").val("");
 });
 
 function saveRecord(locationSave){
+    // Check if the input is already exist in Stored area
+    if (dataLoad.includes(locationSave)){
+        return;
+    }
+    // Save to local datastore
     dataLoad.push(locationSave);
-    // console.log(dataLoad);
-    localStorage.setItem("search-history", JSON.stringify(dataLoad));
+    localStorage.setItem(storageName, JSON.stringify(dataLoad));
 }
 
 function init(){
-    // saveRecord("Chicage");
-    // saveRecord("London");
     if (loadAPIKey()) {
         loadData();
     }
