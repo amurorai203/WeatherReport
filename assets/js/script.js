@@ -45,6 +45,12 @@ function callAPI(location, isNew){
     // fetch the prepared today API URL
     fetch(queryURL)
     .then(function(response){
+        if (response.status == 401){
+            throw new Error("API Key is not valid");
+        } 
+        if (response.status == 404){
+            throw new Error("City is not valid");
+        }   
         return response.json();
     })
     .then(function (data){
@@ -72,6 +78,12 @@ function callAPI(location, isNew){
     // fetch the prepared forecast API URL
     fetch(queryURL)
     .then(function(response){
+        if (response.status == 401){
+            throw new Error("API Key is not valid");
+        } 
+        if (response.status == 404){
+            throw new Error("City is not valid");
+        }   
         return response.json();
     })
     .then(function (data){
