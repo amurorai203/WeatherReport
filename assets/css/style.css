@@ -1,0 +1,41 @@
+img {
+    height: 50px;
+    width: 50px;
+  }
+  
+  .form-input {
+    padding: 3px;
+    font-size: 80%;
+    letter-spacing: 0rem;
+    height: 25px;
+    width: 300px;
+  }
+  
+  .btn {
+    margin: 10px;
+    border-radius: 300px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: white;
+    background-color: blue;
+    width: 300px;
+  }
+  
+  .btn:hover,
+  .btn:focus,
+  .btn:active {
+    color: red;
+    border-color: blue;
+    background-color: #F0F0F0;
+  }
+  
+#today {
+    border: 2px solid blue;
+}
+
+  #forecast {
+    margin: 20px;
+    width: 200px;
+    color: white;
+    background-color: chocolate;
+  }
